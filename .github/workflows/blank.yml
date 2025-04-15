@@ -1,0 +1,35 @@
+name: CloudSim Java CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '8'
+
+    - name: Verify JARs exist
+      run: ls -l jars
+
+    - name: Compile Java files
+      run: |
+        mkdir -p classes
+        find examples -name "*.java" > sources.txt
+        echo "Compiling the following Java files:"
+        cat sources.txt
+        javac -cp "jars/*" -d classes @sources.txt
+
+    - name: Run Simulation
+      run: java -cp "classes:jars/*" MySimulation
